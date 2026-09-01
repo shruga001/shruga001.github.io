@@ -92,6 +92,48 @@
         }
         .replay-hint:hover { color: #fff; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
 
+        .music-toggle {
+            position: absolute;
+            bottom: 22px;
+            right: 22px;
+            z-index: 12;
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: background 160ms ease, transform 160ms ease, border-color 160ms ease;
+        }
+        .music-toggle:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); transform: scale(1.04); }
+        .music-toggle[aria-pressed="true"] { background: #fff; color: #0c0a09; border-color: #fff; }
+        .music-hint {
+            position: absolute;
+            bottom: 68px;
+            right: 22px;
+            z-index: 12;
+            background: rgba(0,0,0,0.48);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.82);
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            padding: 6px 10px;
+            border-radius: 9999px;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 300ms ease, transform 300ms ease;
+            pointer-events: none;
+        }
+        .music-hint.is-visible { opacity: 1; transform: translateY(0); }
+
         .ribbon {
             position: absolute;
             left: 50%;
@@ -380,7 +422,13 @@
         </div>
 
         <button class="replay-hint" id="replayBtn" type="button">tap to replay · R</button>
+        <button class="music-toggle" id="musicToggle" type="button" aria-label="Play music from 1:05" aria-pressed="false">♪</button>
+        <span class="music-hint" id="musicHint">tap to play from 1:05</span>
     </main>
+
+    <audio id="bgMusic" preload="auto" playsinline>
+        <source src="./music.mp3" type="audio/mpeg">
+    </audio>
 
     <noscript>
         <style>.sun-glow,.stem,.leaf,.flower-head,.message-block{opacity:1!important;transform:none!important}</style>
