@@ -8,6 +8,10 @@
     var ribbon = document.getElementById("ribbon");
     var sunflowers = document.querySelectorAll(".sunflower");
     var butterfliesRoot = document.getElementById("butterflies");
+    var bgMusic = document.getElementById("bgMusic");
+    var musicToggle = document.getElementById("musicToggle");
+    var musicHint = document.getElementById("musicHint");
+    var MUSIC_START = 65; // 1:05
 
     var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -230,5 +234,102 @@
         if (e.target === document.body || e.target.id === "bloom") runTimeline();
     });
 
-    window.addEventListener("load", function () { setTimeout(runTimeline, 160); });
+    // ——— background music from 1:05 ———
+    var musicReady = false;
+    var musicWanted = true;
+
+    function updateMusicUI() {
+        if (!bgMusic || !musicToggle) return;
+        var playing = !bgMusic.paused && !bgMusic.ended;
+        musicToggle.textContent = playing ? "❚❚" : "♪";
+        musicToggle.setAttribute("aria-pressed", String(playing));
+        musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music from 1:05");
+        if (musicHint) {
+            musicHint.textContent = playing ? "playing from 1:05" : "tap to play from 1:05";
+            musicHint.classList.toggle("is-visible", !playing && musicReady);
+        }
+    }
+
+    function seekToStart() {
+        if (!bgMusic) return;
+        try {
+            if (!isNaN(bgMusic.duration) && bgMusic.duration > MUSIC_START) {
+                bgMusic.currentTime = MUSIC_START;
+            } else {
+                // duration not yet known — will seek on loadedmetadata
+                bgMusic.currentTime = MUSIC_START;
+            }
+        } catch (e) {}
+    }
+
+    function tryPlayMusic() {
+        if (!bgMusic || !musicWanted) return;
+        seekToStart();
+        var p = bgMusic.play();
+        if (p && p.catch) {
+            p.then(function () { updateMusicUI(); }).catch(function () {
+                // autoplay blocked — wait for user gesture
+                updateMusicUI();
+            });
+        } else {
+            updateMusicUI();
+        }
+    }
+
+    if (bgMusic) {
+        bgMusic.volume = 0.72;
+        bgMusic.addEventListener("loadedmetadata", function () {
+            musicReady = true;
+            seekToStart();
+            updateMusicUI();
+            // try autoplay — will succeed only after gesture in most browsers
+            tryPlayMusic();
+        });
+        bgMusic.addEventListener("canplay", function () { musicReady = true; updateMusicUI(); });
+        bgMusic.addEventListener("play", updateMusicUI);
+        bgMusic.addEventListener("pause", updateMusicUI);
+        bgMusic.addEventListener("ended", function () {
+            // loop back to 1:05, not 0
+            seekToStart();
+            bgMusic.play().catch(function () {});
+        });
+        // if music is seeking past end -> loop to 65
+        bgMusic.addEventListener("timeupdate", function () {
+            if (!isNaN(bgMusic.duration) && bgMusic.currentTime > bgMusic.duration - 0.4) {
+                seekToStart();
+            }
+        });
+        // if already cached, metadata may already be available
+        if (bgMusic.readyState >= 1) { musicReady = true; updateMusicUI(); }
+        // show hint after short delay
+        setTimeout(function () { if (bgMusic.paused) { musicReady = true; updateMusicUI(); } }, 900);
+    }
+
+    if (musicToggle && bgMusic) {
+        musicToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            if (bgMusic.paused) {
+                musicWanted = true;
+                tryPlayMusic();
+            } else {
+                bgMusic.pause();
+                musicWanted = false;
+                updateMusicUI();
+            }
+        });
+    }
+
+    // first interaction anywhere unlocks audio (browser autoplay policy)
+    var unlock = function () {
+        if (bgMusic && bgMusic.paused && musicWanted) tryPlayMusic();
+    };
+    document.addEventListener("click", unlock, { once: false });
+    document.addEventListener("keydown", unlock, { once: false });
+    document.addEventListener("touchstart", unlock, { once: false, passive: true });
+
+    window.addEventListener("load", function () {
+        setTimeout(runTimeline, 160);
+        // attempt music after bloom starts — browsers will queue until gesture
+        setTimeout(tryPlayMusic, 900);
+    });
 })();
