@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gorg — A flower's day</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,300;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/gorg-base-2026.css">
+    <link rel="stylesheet" href="./css/gorg-layout-2026.css">
+    <link rel="stylesheet" href="./css/gorg-animation-2026.css">
+    <style>
+        html, body { overflow: hidden; background: var(--surface-dark); }
+        .stage {
+            position: relative;
+            min-height: 100vh; min-height: 100dvh;
+            background: var(--surface-dark);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            isolation: isolate;
+        }
+        /* central solo flower */
+        .solo-scene {
+            position: relative;
+            width: min(560px, 92vw);
+            height: min(62vh, 520px);
+            min-height: 380px;
+            display: block;
+            z-index: 3;
+            overflow: visible;
+            margin-top: 28px;
+        }
+        .solo-flower {
+            position: absolute;
+            inset: 0;
+            display: block;
+            overflow: visible;
+            --stem-h: 58%;
+            --flower: 188px;
+            --center: 84px;
+            --petal-w: 46px;
+            --petal-h: 74px;
+        }
+        .solo-flower .stem {
+            left: 50%;
+            height: var(--stem-h);
+        }
+        .solo-flower .leaf-a { bottom: calc(var(--stem-h) * 0.44); }
+        .solo-flower .leaf-b { bottom: calc(var(--stem-h) * 0.22); }
+        .solo-flower .flower-head {
+            bottom: calc(var(--stem-h) - 12px);
+            width: var(--flower);
+            height: var(--flower);
+        }
+        /* text acts — stacked, cross-fade + readable card over glow */
+        .narrative {
+            position: absolute;
+            left: 50%;
+            top: 18%;
+            transform: translate(-50%, 0);
+            width: min(720px, calc(100% - 32px));
+            z-index: 11;
+            text-align: center;
+            pointer-events: none;
+            overflow: visible;
+        }
+        .act {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 700ms cubic-bezier(0.22,1,0.36,1), transform 700ms cubic-bezier(0.22,1,0.36,1);
+        }
+        .act.is-active { opacity: 1; transform: translateY(0); }
+        .act.is-exit { opacity: 0; transform: translateY(-10px); }
+        /* readable card — sits above flower/light, ElevenLabs dark elevated */
+        .act > div {
+            background: rgba(12,10,9,0.58);
+            border: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 18px 20px 16px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.44), 0 1px 0 rgba(255,255,255,0.06) inset;
+        }
+        .act h1 {
+            margin: 0;
+            color: #fff;
+            text-wrap: balance;
+            text-shadow: 0 1px 0 rgba(0,0,0,0.45);
+            letter-spacing: -0.02em;
+        }
+        .act h1 em {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 300;
+            color: var(--gradient-peach);
+        }
+        .act p {
+            margin: 12px auto 0;
+            max-width: 520px;
+            color: #e7e5e4;
+            font-size: 15px;
+            line-height: 1.6;
+            letter-spacing: 0.14px;
+            text-shadow: 0 1px 10px rgba(0,0,0,0.35);
+        }
+        .act .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.88);
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            backdrop-filter: blur(8px);
+        }
+        .act .eyebrow i { width: 6px; height: 6px; border-radius: 50%; background: var(--gradient-peach); box-shadow: 0 0 10px rgba(244,197,168,0.7); display: block; }
+
+        /* butterflies — hidden until act 3 */
+        .butterflies { z-index: 9; }
+        .butterflies.is-hidden { opacity: 0; pointer-events: none; }
+        .butterflies.is-visible { opacity: 1; }
+
+        /* hint to replay */
+        .replay-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.58);
+            font-family: var(--font-body);
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 9px 16px;
+            border-radius: 9999px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 160ms ease;
+        }
+        .replay-hint:hover { color: #fff; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            .solo-scene { width: 92vw; height: 52vh; min-height: 360px; margin-top: 36px; }
+            .solo-flower { --flower: 152px; --center: 68px; --petal-w: 38px; --petal-h: 62px; }
+            .narrative { top: 14%; width: calc(100% - 24px); }
+            .act > div { padding: 14px 16px 12px; border-radius: 14px; }
+            .act h1 { font-size: 30px; }
+            .act p { font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .solo-flower { --flower: 132px; --center: 60px; --petal-w: 34px; --petal-h: 56px; }
+            .narrative { top: 12%; }
+            .act h1 { font-size: 26px; }
+        }
+        @media (max-height: 700px) {
+            .solo-scene { height: 56vh; margin-top: 18px; }
+            .narrative { top: 12%; }
+        }
+        /* tap overlay for autoplay */
+        .tap-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            background: rgba(12,10,9,0.72);
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            transition: opacity 400ms ease, visibility 400ms ease;
+        }
+        .tap-overlay.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .tap-card {
+            background: #fff;
+            color: #0c0a09;
+            padding: 18px 22px;
+            border-radius: 9999px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.32);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tap-card i { width: 8px; height: 8px; border-radius: 50%; background: #e8a317; display: block; animation: pulseDot 1.2s ease-in-out infinite; }
+        @keyframes pulseDot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.7; } }
+
+        /* reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .act { transition: opacity 200ms linear; transform: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="tap-overlay" id="tapOverlay" role="button" tabindex="0" aria-label="Tap to start music">
+        <span class="tap-card"><i></i> Tap to bloom with music — from 1:05</span>
+    </div>
+    <main class="stage" id="bloom" aria-label="A flower's day">
+        <div class="sun-glow" id="sunGlow" aria-hidden="true"></div>
+        <div id="petalRain" class="petal-rain" aria-hidden="true"></div>
+        <div id="petalsLayer" aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; z-index:2; overflow:visible;"></div>
+
+        <div class="narrative" id="narrative" aria-live="polite">
+            <div class="act is-active" id="act1">
+                <div>
+                    <span class="eyebrow"><i></i> ACT I / III</span>
+                    <h1 class="display-mega">Look at this <em>happy flower</em></h1>
+                    <p>Standing tall, open to the sun — as if nothing could ever dim it.</p>
+                </div>
+            </div>
+            <div class="act" id="act2">
+                <div>
+                    <span class="eyebrow"><i style="background:#a8a29e; box-shadow:none;"></i> ACT II / III</span>
+                    <h1 class="display-mega">Oh no — <em>a bad day</em> has arrived</h1>
+                    <p>Petals loosen. The head bows. Even bright things need to wilt sometimes.</p>
+                </div>
+            </div>
+            <div class="act" id="act3">
+                <div>
+                    <span class="eyebrow"><i style="background:#a7e5d3;"></i> ACT III / III</span>
+                    <h1 class="display-mega">Remember — <em>bad days</em> are just intervals</h1>
+                    <p style="margin-top:12px;">Between good days. Hold on, the light always finds its way back.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="butterflies is-hidden" id="butterflies" aria-hidden="true"></div>
+
+        <div class="solo-scene" aria-hidden="true">
+            <div class="solo-flower" id="soloFlower">
+                <div class="stem" id="soloStem"></div>
+                <span class="leaf leaf-a" id="leafA"></span>
+                <span class="leaf leaf-b" id="leafB"></span>
+                <div class="flower-head" id="soloHead">
+                    <div class="petals petals-back"></div>
+                    <div class="petals petals-front"></div>
+                    <div class="center"><span class="center-ring"></span><span class="center-core"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="replay-hint" id="replayBtn" type="button">replay story · R</button>
+    </main>
+
+    <audio id="bgMusic" preload="auto" playsinline autoplay>
+        <source src="./gorg-music-2026.mp3" type="audio/mpeg">
+    </audio>
+
+    <noscript>
+        <style>.sun-glow,.stem,.leaf,.flower-head{opacity:1!important;transform:none!important}</style>
+    </noscript>
+    <script src="./js/gorg-story-2026.js"></script>
+</body>
+</html>
