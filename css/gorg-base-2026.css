@@ -1,0 +1,235 @@
+/* gorg/css/base.css — ElevenLabs DESIGN.md tokens — base variables & typography */
+:root {
+    /* canvas & surface — DESIGN.md */
+    --canvas: #f5f5f5;
+    --canvas-soft: #fafafa;
+    --canvas-deep: #0c0a09;
+    --surface-card: #ffffff;
+    --surface-strong: #f0efed;
+    --surface-dark: #0c0a09;
+    --surface-dark-elevated: #1c1917;
+
+    /* ink & text */
+    --primary: #292524;
+    --primary-active: #0c0a09;
+    --ink: #0c0a09;
+    --body: #4e4e4e;
+    --body-strong: #292524;
+    --muted: #777169;
+    --muted-soft: #a8a29e;
+    --on-primary: #ffffff;
+    --on-dark: #ffffff;
+    --on-dark-soft: #a8a29e;
+
+    /* hairlines */
+    --hairline: #e7e5e4;
+    --hairline-soft: #f0efed;
+    --hairline-strong: #d6d3d1;
+    --hairline-dark: rgba(255,255,255,0.08);
+    --hairline-dark-strong: rgba(255,255,255,0.14);
+
+    /* atmospheric gradients */
+    --gradient-mint: #a7e5d3;
+    --gradient-peach: #f4c5a8;
+    --gradient-lavender: #c8b8e0;
+    --gradient-sky: #a8c8e8;
+    --gradient-rose: #e8b8c4;
+
+    /* semantic */
+    --semantic-error: #dc2626;
+    --semantic-success: #16a34a;
+
+    /* sunflower accent */
+    --sunflower-petal: #f4c63a;
+    --sunflower-petal-deep: #e8a317;
+    --sunflower-center: #3d2b0e;
+    --sunflower-center-soft: #7a5a1f;
+    --sunflower-stem: #5b7a3a;
+    --sunflower-stem-light: #7fa65a;
+
+    /* radius */
+    --rounded-xs: 4px;
+    --rounded-sm: 6px;
+    --rounded-md: 8px;
+    --rounded-lg: 12px;
+    --rounded-xl: 16px;
+    --rounded-xxl: 24px;
+    --rounded-pill: 9999px;
+    --rounded-full: 9999px;
+
+    /* spacing */
+    --space-xxs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-base: 16px;
+    --space-md: 20px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+    --space-section: 96px;
+
+    /* typography fallbacks — Waldenburg Light -> EB Garamond @ 300 */
+    --font-display: "EB Garamond", "Times New Roman", serif;
+    --font-body: "Inter", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-width: 320px;
+    background: var(--surface-dark);
+    color: var(--on-dark);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, textarea, select {
+    font: inherit;
+}
+
+button {
+    border: 0;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: var(--gradient-peach);
+    color: var(--ink);
+}
+
+/* typography tokens */
+.display-mega {
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -1.92px;
+}
+
+.display-xl {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1.08;
+    letter-spacing: -0.96px;
+}
+
+.display-lg {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.17;
+    letter-spacing: -0.36px;
+}
+
+.display-md {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1.13;
+    letter-spacing: -0.32px;
+}
+
+.display-sm {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.title-md {
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.title-sm {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.44;
+    letter-spacing: 0.18px;
+}
+
+.body-md {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.16px;
+}
+
+.body-strong {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.16px;
+}
+
+.body-sm {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: 0.15px;
+}
+
+.caption {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.caption-uppercase {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.96px;
+    text-transform: uppercase;
+}
+
+.button-text {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.nav-link {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+@media (max-width: 767px) {
+    .display-mega {
+        font-size: 32px;
+        letter-spacing: -0.64px;
+        line-height: 1.1;
+    }
+    .display-xl {
+        font-size: 32px;
+    }
+    .display-lg {
+        font-size: 28px;
+    }
+}
